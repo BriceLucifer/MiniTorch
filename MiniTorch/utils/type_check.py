@@ -1,8 +1,10 @@
 import numpy as np
-import numpy.typing as npt
 
 
-def as_array(x) -> npt.NDArray:
+def as_array(x):
+    """
+    check if x is a numpy array
+    """
     if np.isscalar(x):
         return np.array(x)
     else:

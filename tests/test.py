@@ -2,9 +2,7 @@ import unittest
 
 import numpy as np
 
-from function import square
-from numer_diff import numerical_diff
-from variable import Variable
+from MiniTorch import Variable, numerical_diff, square
 
 
 class SquareTest(unittest.TestCase):

@@ -1,8 +1,5 @@
 import numpy as np
-
-from function import exp, square
-from variable import Variable
-
+from MiniTorch import Variable,
 
 def main():
     x = np.array([1.0])
