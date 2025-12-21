@@ -1,7 +1,6 @@
 import numpy as np
 
-from function import Exp, Function, Square
-from numer_diff import numerical_diff
+from function import Exp, Square, exp, square
 from variable import Variable
 
 
@@ -13,16 +12,13 @@ def f(x: Variable):
 
 
 def main():
-    data = np.array(2.0)
-    x = Variable(data)
-    print(x.data)
+    x = Variable(np.array(0.5))
+    a = square(x)
+    b = exp(a)
+    y = square(b)
 
-    f = Square()
-    y = f(x)
-    dy = numerical_diff(f, x)
-    print(y.data)
-    print(dy)
-    print(type(y))
+    y.backward()
+    print(x.grad)
 
 
 if __name__ == "__main__":

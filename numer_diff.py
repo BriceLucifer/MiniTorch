@@ -1,8 +1,7 @@
-from function import Function
 from variable import Variable
 
 
-def numerical_diff(f: Function, x: Variable, eps=1e-4):
+def numerical_diff(f, x: Variable, eps=1e-4):
     x0 = Variable(x.data - eps)
     x1 = Variable(x.data + eps)
     y0 = f(x0)
