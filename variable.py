@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 
 class Variable:
     def __init__(self, data: npt.NDArray) -> None:
+        # I use type check to avoid input problem
         self.data: npt.NDArray = data
         self.grad: Optional[npt.NDArray] = None
         self.creator: Optional["Function"] = None

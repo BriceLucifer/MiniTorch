@@ -3,6 +3,7 @@ from typing import Optional
 import numpy as np
 import numpy.typing as npt
 
+from type_check import as_array
 from variable import Variable
 
 
@@ -23,7 +24,7 @@ class Function:
         x = input.data
         # forward()
         y = self.forward(x)
-        output = Variable(y)
+        output = Variable(as_array(y))
         # let the output save the creator function
         output.set_creator(self)
         # save the input and output
