@@ -3,6 +3,7 @@ from typing import override
 import numpy.typing as npt
 
 from MiniTorch.core import Function, Variable
+from MiniTorch.utils.type_check import as_array
 
 
 class Square(Function):

@@ -1,4 +1,5 @@
 from MiniTorch.core.function import Function
+from MiniTorch.utils.type_check import as_array
 
 
 class Add(Function):
@@ -20,3 +21,8 @@ class Add(Function):
             two value with the same gy
         """
         return gy, gy
+
+
+def add(x0, x1):
+    x1 = as_array(x1)
+    return Add()(x0, x1)

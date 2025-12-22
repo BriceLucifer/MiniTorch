@@ -1,8 +1,6 @@
-from typing import List
-
 import numpy as np
 
-from MiniTorch.core import Function, Variable
+from MiniTorch.core import Function
 
 
 class Exp(Function):

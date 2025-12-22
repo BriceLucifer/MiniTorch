@@ -1,11 +1,12 @@
 import numpy as np
-from MiniTorch import Variable,
+
+from MiniTorch import Variable
+
 
 def main():
-    x = np.array([1.0])
+    x = Variable(np.array(2.0))
     y = x**2
-    print(type(x), x.ndim)
-    print(type(y))
+    print(y)
 
 
 if __name__ == "__main__":

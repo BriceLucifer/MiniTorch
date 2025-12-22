@@ -9,3 +9,12 @@ def as_array(x):
         return np.array(x)
     else:
         return x
+
+
+def as_variable(x):
+    from MiniTorch.core.variable import Variable
+
+    if isinstance(x, Variable):
+        return x
+    else:
+        return Variable(x)
