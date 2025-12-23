@@ -15,7 +15,7 @@ class Exp(Function):
         return np.exp(x)
 
     def backward(self, gy):  # type: ignore[override]
-        x = self.inputs[0].data
+        x = self.inputs[0].data  # type: ignore
         return np.exp(x) * gy
 
 

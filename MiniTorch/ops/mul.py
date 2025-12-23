@@ -7,7 +7,7 @@ class Mul(Function):
         return x0 * x1
 
     def backward(self, gy):  # type: ignore
-        x0, x1 = self.inputs[0].data, self.inputs[1].data
+        x0, x1 = self.inputs  # type: ignore
         return gy * x1, gy * x0
 
 

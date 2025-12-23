@@ -1,6 +1,9 @@
+import math
+
+import matplotlib.pyplot as plt
 import numpy as np
 
-from MiniTorch import Variable, visualize_graph
+from MiniTorch import Variable, cos, sin, tanh, visualize_graph
 
 
 def sphere(x, y):
@@ -24,13 +27,41 @@ def goldstein(x, y):
     return z
 
 
+def my_sin(x, threshold=0.0001):
+    y = 0
+    for i in range(100000):
+        c = (-1) ** i / math.factorial(2 * i + 1)
+        t = c * x ** (2 * i + 1)
+        y = y + t
+        if abs(t.data) < threshold:
+            break
+    return y
+
+
+def rosenbrock(x0, x1):
+    y = 100 * (x1 - x0**2) ** 2 + (x0 - 1) ** 2
+    return y
+
+
+def f(x):
+    y = x**4 - 2 * x**2
+    return y
+
+
 def main():
     x = Variable(np.array(1.0))
-    y = Variable(np.array(1.0))
-
-    z = goldstein(x, y)
-    z.backward(retain_grad=True)  # type: ignore
-    visualize_graph(z, "graph.html")
+    y = tanh(x)
+    x.name = "x"
+    y.name = "y"  # type: ignore
+    y.backward(create_graph=True)  # type: ignore
+    iters = 0
+    for i in range(iters):
+        gx = x.grad
+        x.clear_grad()
+        gx.backward(create_graph=True)
+    gx = x.grad
+    gx.name = "gx" + str(iters + 1)
+    visualize_graph(gx, filename="graph.html")
 
 
 if __name__ == "__main__":

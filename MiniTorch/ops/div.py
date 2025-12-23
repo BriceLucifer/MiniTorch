@@ -8,9 +8,9 @@ class Div(Function):
         return y
 
     def backward(self, gy):  # type: ignore
-        x0, x1 = self.inputs[0].data, self.inputs[1].data  # type: ignore
+        x0, x1 = self.inputs  # type: ignore
         gx0 = gy / x1
-        gx1 = gy * (-x0 / x1**2)
+        gx1 = gy * (-x0 / x1**2)  # type: ignore
         return gx0, gx1
 
 

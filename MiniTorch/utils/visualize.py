@@ -108,7 +108,7 @@ def visualize_graph(
         label = (
             f"{v.name or 'Variable'}\n"
             f"dim={dim}\n"
-            f"dtype={dtype}"
+            f"dtype={dtype}\n"
             f"data={_fmt(data)}\n"
             f"grad={_fmt(getattr(v, 'grad', None))}"
         )

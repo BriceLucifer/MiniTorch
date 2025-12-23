@@ -11,7 +11,7 @@ class Pow(Function):
         return y
 
     def backward(self, gy):  # type:ignore
-        x = self.inputs[0].data  # type: ignore
+        (x,) = self.inputs  # type: ignore
         c = self.c
         gx = c * x ** (c - 1) * gy
         return gx

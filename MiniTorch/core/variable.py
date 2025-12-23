@@ -1,6 +1,6 @@
 import numpy as np
 
-from MiniTorch.core.config import Config
+from MiniTorch.core.config import Config, using_config
 
 
 class Variable:
@@ -111,12 +111,12 @@ class Variable:
     def clear_grad(self):
         self.grad = None
 
-    def backward(self, retain_grad: bool = False):
+    def backward(self, retain_grad: bool = False, create_graph: bool = False):
         if not Config.enable_backprob:
             raise RuntimeError("backward() is not allowed in no_grad mode")
 
         if self.grad is None:
-            self.grad = np.ones_like(self.data)
+            self.grad = Variable(np.ones_like(self.data))
 
         funcs = []
         seen_set = set()
@@ -133,19 +133,21 @@ class Variable:
         while funcs:
             f = funcs.pop()
             gys = [output().grad for output in f.outputs]  # type: ignore
-            gxs = f.backward(*gys)
-            if not isinstance(gxs, tuple):
-                gxs = (gxs,)
 
-            for x, gx in zip(f.inputs, gxs):
-                if x.grad is None:
-                    x.grad = gx
-                else:
-                    x.grad = x.grad + gx
+            with using_config("enable_backprob", create_graph):
+                gxs = f.backward(*gys)
+                if not isinstance(gxs, tuple):
+                    gxs = (gxs,)
 
-                if x.creator is not None:
-                    add_func(x.creator)
+                for x, gx in zip(f.inputs, gxs):
+                    if x.grad is None:
+                        x.grad = gx
+                    else:
+                        x.grad = x.grad + gx
 
-            if not retain_grad:
+                    if x.creator is not None:
+                        add_func(x.creator)
+
+            if (not retain_grad) and (not create_graph):
                 for y in f.outputs:
                     y().grad = None  # type:ignore
