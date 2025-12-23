@@ -8,4 +8,13 @@ from MiniTorch.ops.pow import pow
 from MiniTorch.ops.square import square
 from MiniTorch.ops.sub import rsub, sub
 
-__all__ = ["square", "exp", "add", "neg", "mul", "sub", "rsub", "pow"]
+__all__ = [
+    "square",
+    "exp",
+    "add",
+    "neg",
+    "mul",
+    "sub",
+    "rsub",
+    "pow",
+]

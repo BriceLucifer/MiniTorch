@@ -18,7 +18,7 @@ class Function:
         self.output = None
 
     def __call__(self: "Function", *inputs):
-        inputs = {as_variable(x) for x in inputs}
+        inputs = [as_variable(x) for x in inputs]
         # we save the input variable
         xs = [x.data for x in inputs]
         # forward()
