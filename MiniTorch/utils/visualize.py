@@ -102,10 +102,13 @@ def visualize_graph(
 
         data = getattr(v, "data", None)
 
+        dim = data.ndim if data is not None else None
+        dtype = data.dtype if data is not None else None
+
         label = (
             f"{v.name or 'Variable'}\n"
-            f"shape={getattr(data, 'shape', None)}\n"
-            f"dtype={getattr(data, 'dtype', None)}\n"
+            f"dim={dim}\n"
+            f"dtype={dtype}"
             f"data={_fmt(data)}\n"
             f"grad={_fmt(getattr(v, 'grad', None))}"
         )
@@ -116,7 +119,7 @@ def visualize_graph(
             shape="box",
             borderWidth=1.5,
             borderWidthSelected=2,
-            color={
+            color={  # type: ignore
                 "background": "#eef2ff",  # indigo-50
                 "border": "#6366f1",  # indigo-500
                 "highlight": {"background": "#e0e7ff", "border": "#4f46e5"},
@@ -144,7 +147,7 @@ def visualize_graph(
             label=f.__class__.__name__,
             shape="box",
             borderWidth=1.5,
-            color={
+            color={  # type: ignore
                 "background": "#fff7ed",  # orange-50
                 "border": "#f97316",  # orange-500
                 "highlight": {"background": "#ffedd5", "border": "#ea580c"},
