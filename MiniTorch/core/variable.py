@@ -104,6 +104,19 @@ class Variable:
 
         return pow(self, other)
 
+    def reshape(self, *shape):
+        if len(shape) == 1 and isinstance(shape[0], (tuple, list)):
+            shape = shape[0]
+        from MiniTorch.ops.reshape import reshape
+
+        return reshape(self, shape)
+
+    @property
+    def T(self):
+        from MiniTorch.ops.transpose import transpose
+
+        return transpose(self)
+
     def set_creator(self, func):
         self.creator = func
         self.generation = func.generation + 1

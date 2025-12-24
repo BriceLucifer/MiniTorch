@@ -3,7 +3,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-from MiniTorch import Variable, cos, sin, tanh, visualize_graph
+from MiniTorch import Variable, cos, reshape, sin, tanh, transpose, visualize_graph
 
 
 def sphere(x, y):
@@ -49,19 +49,10 @@ def f(x):
 
 
 def main():
-    x = Variable(np.array(1.0))
-    y = tanh(x)
-    x.name = "x"
-    y.name = "y"  # type: ignore
-    y.backward(create_graph=True)  # type: ignore
-    iters = 0
-    for i in range(iters):
-        gx = x.grad
-        x.clear_grad()
-        gx.backward(create_graph=True)
-    gx = x.grad
-    gx.name = "gx" + str(iters + 1)
-    visualize_graph(gx, filename="graph.html")
+    x = Variable(np.array([[1, 2, 3], [4, 5, 6]]))
+    print(x)
+    y = x.T
+    print(y)
 
 
 if __name__ == "__main__":

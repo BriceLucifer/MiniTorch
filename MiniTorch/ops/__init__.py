@@ -6,10 +6,12 @@ from MiniTorch.ops.exp import exp
 from MiniTorch.ops.mul import mul
 from MiniTorch.ops.neg import neg
 from MiniTorch.ops.pow import pow
+from MiniTorch.ops.reshape import reshape
 from MiniTorch.ops.sin import sin
 from MiniTorch.ops.square import square
 from MiniTorch.ops.sub import rsub, sub
 from MiniTorch.ops.tanh import tanh
+from MiniTorch.ops.transpose import transpose
 
 __all__ = [
     "square",
@@ -23,4 +25,6 @@ __all__ = [
     "sin",
     "cos",
     "tanh",
+    "reshape",
+    "transpose",
 ]
