@@ -4,6 +4,7 @@ from MiniTorch.ops.add import add
 from MiniTorch.ops.broadcast import broadcast_to
 from MiniTorch.ops.cos import cos
 from MiniTorch.ops.exp import exp
+from MiniTorch.ops.matmul import matmul
 from MiniTorch.ops.mul import mul
 from MiniTorch.ops.neg import neg
 from MiniTorch.ops.pow import pow
@@ -33,4 +34,5 @@ __all__ = [
     "broadcast_to",
     "sum",
     "sum_to",
+    "matmul",
 ]

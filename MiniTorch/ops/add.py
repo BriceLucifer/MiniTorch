@@ -10,6 +10,7 @@ class Add(Function):
         return:
             tuple with y (y, )
         """
+        self.x0_shape, self.x1_shape = x0.shape, x1.shape
         y = x0 + x1
         return y
 
@@ -20,7 +21,14 @@ class Add(Function):
         return:
             two value with the same gy
         """
-        return gy, gy
+        gx0, gx1 = gy, gy
+        if self.x0_shape != self.x1_shape:
+            from MiniTorch.ops.sum_to import sum_to
+
+            gx0 = sum_to(gx0, self.x0_shape)
+            gx1 = sum_to(gx1, self.x1_shape)
+
+        return gx0, gx1
 
 
 def add(x0, x1):

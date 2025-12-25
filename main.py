@@ -3,7 +3,16 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-from MiniTorch import Variable, cos, reshape, sin, tanh, transpose, visualize_graph
+from MiniTorch import (
+    Variable,
+    cos,
+    matmul,
+    reshape,
+    sin,
+    tanh,
+    transpose,
+    visualize_graph,
+)
 
 
 def sphere(x, y):
@@ -49,10 +58,13 @@ def f(x):
 
 
 def main():
-    x0 = Variable(np.array([1, 2, 3]))
-    x1 = Variable(np.array([10]))
-    y = x0 + x1
+    x0 = Variable(np.random.randn(2, 3))
+    x1 = Variable(np.random.randn(3, 2))
+    y = matmul(x0, x1)
     print(y)
+
+    y.backward(create_graph=True, retain_grad=True)
+    visualize_graph(y, filename="graph.html")
 
 
 if __name__ == "__main__":
