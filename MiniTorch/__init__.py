@@ -1,6 +1,7 @@
 from MiniTorch.core import Config, Function, Variable, no_grad, with_grad
 from MiniTorch.ops import (
     add,
+    broadcast_to,
     cos,
     div,
     exp,
@@ -10,6 +11,8 @@ from MiniTorch.ops import (
     reshape,
     sin,
     square,
+    sum,
+    sum_to,
     tanh,
     transpose,
 )
@@ -35,6 +38,9 @@ __all__ = [
     "sin",
     "cos",
     "tanh",
+    "broadcast_to",
+    "sum",
+    "sum_to",
     "reshape",
     "numerical_diff",
     "as_array",
