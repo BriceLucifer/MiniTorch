@@ -2,6 +2,11 @@
 
 A lightweight autograd framework for AI training, built from scratch with NumPy.
 
+[![CI/CD Pipeline](https://github.com/BriceLucifer/MiniTorch/actions/workflows/workflow.yml/badge.svg)](https://github.com/BriceLucifer/MiniTorch/actions/workflows/workflow.yml)
+[![PyPI Version](https://img.shields.io/pypi/v/minitorchbr.svg)](https://pypi.org/project/minitorchbr/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/minitorchbr.svg)](https://pypi.org/project/minitorchbr/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## Features
 
 - **Automatic Differentiation**: Reverse-mode automatic differentiation with computational graph
