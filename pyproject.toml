@@ -1,12 +1,12 @@
 [project]
-name = "minitorch"
+name = "minitorchbr"
 version = "0.1.0"
 description = "A lightweight autograd framework for AI training"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "MiniTorch Contributors"}
+    {name = "BriceLucifer"}
 ]
 keywords = ["autograd", "deep-learning", "machine-learning", "neural-networks", "numpy"]
 classifiers = [
