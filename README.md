@@ -106,7 +106,8 @@ from MiniTorch import Variable, square, add, visualize_graph
 
 x = Variable(np.array(2.0), name='x')
 y = Variable(np.array(3.0), name='y')
-z = add(square(x), square(y), name='z')
+z = add(square(x), square(y))
+z.name = "z"
 
 # Generate interactive visualization
 visualize_graph(z, filename='graph.html')
