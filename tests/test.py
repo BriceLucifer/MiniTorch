@@ -15,14 +15,14 @@ class SquareTest(unittest.TestCase):
     def test_backward(self):
         x = Variable(np.array(3.0))
         y = square(x)
-        y.backward()
+        y.backward()  # type: ignore
         expected = np.array(6.0)
-        self.assertEqual(x.grad.data, expected)
+        self.assertEqual(x.grad.data, expected)  # type: ignore
 
     def test_gradient_check(self):
         x = Variable(np.random.rand(1))
         y = square(x)  # type: ignore
-        y.backward()
+        y.backward()  # type: ignore
         num_grad = numerical_diff(square, x)
         flg = np.allclose(x.grad.data, num_grad)  # type: ignore
         self.assertTrue(flg)
