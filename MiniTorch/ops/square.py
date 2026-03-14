@@ -18,7 +18,7 @@ class Square(Function):
         return x**2
 
     def backward(self, gy):  # type: ignore[override]
-        x = self.inputs[0].data
+        x = self.inputs[0].data  # type: ignore
         gx = 2 * x * gy
         return gx
 

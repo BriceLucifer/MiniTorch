@@ -5,6 +5,7 @@ from MiniTorch.ops.broadcast import broadcast_to
 from MiniTorch.ops.cos import cos
 from MiniTorch.ops.exp import exp
 from MiniTorch.ops.matmul import matmul
+from MiniTorch.ops.meansquarederror import mean_squared_error
 from MiniTorch.ops.mul import mul
 from MiniTorch.ops.neg import neg
 from MiniTorch.ops.pow import pow
@@ -35,4 +36,5 @@ __all__ = [
     "sum",
     "sum_to",
     "matmul",
+    "mean_squared_error",
 ]
