@@ -9,10 +9,6 @@
     "docs:preview": "vitepress preview"
   },
   "devDependencies": {
-    "sass-embedded": "^1.98.0",
     "vitepress": "^1.5.0"
-  },
-  "dependencies": {
-    "@sugarat/theme": "^0.5.17"
   }
 }
