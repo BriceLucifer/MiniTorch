@@ -11,8 +11,8 @@ pip install minitorchbr
 Or install from source:
 
 ```bash
-git clone https://github.com/BriceLucifer/minitorchbr.git
-cd minitorchbr
+git clone https://github.com/BriceLucifer/MiniTorch.git
+cd MiniTorch
 pip install -e .
 ```
 

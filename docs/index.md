@@ -5,6 +5,9 @@ hero:
   name: MiniTorchBR
   text: Autograd from scratch
   tagline: A lightweight PyTorch-inspired deep learning framework built on NumPy — learn how backpropagation really works.
+  image:
+    src: /hero.svg
+    alt: MiniTorchBR neural network computation graph
   actions:
     - theme: brand
       text: Get Started

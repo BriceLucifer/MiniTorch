@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 320" fill="none">
+  <defs>
+    <!-- Input layer glow -->
+    <radialGradient id="gInput" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6EE7F7" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.6"/>
+    </radialGradient>
+    <!-- Hidden layer glow -->
+    <radialGradient id="gHidden" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#A78BFA" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#7C3AED" stop-opacity="0.6"/>
+    </radialGradient>
+    <!-- Output layer glow -->
+    <radialGradient id="gOutput" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#34D399" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#059669" stop-opacity="0.6"/>
+    </radialGradient>
+    <!-- Loss node -->
+    <radialGradient id="gLoss" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FCD34D" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#F59E0B" stop-opacity="0.8"/>
+    </radialGradient>
+    <!-- Background -->
+    <radialGradient id="gBg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1E1B4B" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#0F0A2A" stop-opacity="0.0"/>
+    </radialGradient>
+    <!-- Glow filters -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background oval -->
+  <ellipse cx="210" cy="160" rx="200" ry="150" fill="url(#gBg)"/>
+
+  <!-- ── Edges: input → hidden ── -->
+  <!-- node positions:
+    Input:  x=60,  y=80/160/240
+    Hidden: x=180, y=100/180/260  (3 nodes)
+    Output: x=300, y=130/230
+    Loss:   x=380, y=180
+  -->
+  <g opacity="0.35" stroke="#93C5FD" stroke-width="1.2">
+    <!-- from i1 -->
+    <line x1="75" y1="80"  x2="165" y2="100"/>
+    <line x1="75" y1="80"  x2="165" y2="180"/>
+    <line x1="75" y1="80"  x2="165" y2="260"/>
+    <!-- from i2 -->
+    <line x1="75" y1="160" x2="165" y2="100"/>
+    <line x1="75" y1="160" x2="165" y2="180"/>
+    <line x1="75" y1="160" x2="165" y2="260"/>
+    <!-- from i3 -->
+    <line x1="75" y1="240" x2="165" y2="100"/>
+    <line x1="75" y1="240" x2="165" y2="180"/>
+    <line x1="75" y1="240" x2="165" y2="260"/>
+  </g>
+
+  <!-- ── Edges: hidden → output ── -->
+  <g opacity="0.35" stroke="#C4B5FD" stroke-width="1.2">
+    <line x1="195" y1="100" x2="285" y2="130"/>
+    <line x1="195" y1="100" x2="285" y2="230"/>
+    <line x1="195" y1="180" x2="285" y2="130"/>
+    <line x1="195" y1="180" x2="285" y2="230"/>
+    <line x1="195" y1="260" x2="285" y2="130"/>
+    <line x1="195" y1="260" x2="285" y2="230"/>
+  </g>
+
+  <!-- ── Edges: output → loss ── -->
+  <g opacity="0.5" stroke="#6EE7B7" stroke-width="1.5">
+    <line x1="315" y1="130" x2="368" y2="173"/>
+    <line x1="315" y1="230" x2="368" y2="187"/>
+  </g>
+
+  <!-- ── Back-prop arrows (dashed, reverse direction) ── -->
+  <g opacity="0.25" stroke="#FCD34D" stroke-width="1" stroke-dasharray="4 3">
+    <line x1="368" y1="173" x2="315" y2="130"/>
+    <line x1="368" y1="187" x2="315" y2="230"/>
+    <line x1="285" y1="130" x2="195" y2="100"/>
+    <line x1="285" y1="130" x2="195" y2="180"/>
+    <line x1="285" y1="230" x2="195" y2="260"/>
+  </g>
+
+  <!-- ── Input nodes ── -->
+  <g filter="url(#glow)">
+    <circle cx="75" cy="80"  r="16" fill="url(#gInput)" stroke="#BAE6FD" stroke-width="1.5"/>
+    <circle cx="75" cy="160" r="16" fill="url(#gInput)" stroke="#BAE6FD" stroke-width="1.5"/>
+    <circle cx="75" cy="240" r="16" fill="url(#gInput)" stroke="#BAE6FD" stroke-width="1.5"/>
+  </g>
+
+  <!-- ── Hidden nodes ── -->
+  <g filter="url(#glow)">
+    <circle cx="180" cy="100" r="16" fill="url(#gHidden)" stroke="#DDD6FE" stroke-width="1.5"/>
+    <circle cx="180" cy="180" r="16" fill="url(#gHidden)" stroke="#DDD6FE" stroke-width="1.5"/>
+    <circle cx="180" cy="260" r="16" fill="url(#gHidden)" stroke="#DDD6FE" stroke-width="1.5"/>
+  </g>
+
+  <!-- ── Output nodes ── -->
+  <g filter="url(#glow)">
+    <circle cx="300" cy="130" r="16" fill="url(#gOutput)" stroke="#A7F3D0" stroke-width="1.5"/>
+    <circle cx="300" cy="230" r="16" fill="url(#gOutput)" stroke="#A7F3D0" stroke-width="1.5"/>
+  </g>
+
+  <!-- ── Loss node ── -->
+  <g filter="url(#softGlow)">
+    <circle cx="380" cy="180" r="20" fill="url(#gLoss)" stroke="#FDE68A" stroke-width="2"/>
+  </g>
+
+  <!-- ── Labels ── -->
+  <text x="75"  y="85"  text-anchor="middle" dominant-baseline="middle" font-size="10" font-family="monospace" fill="white" font-weight="bold">x</text>
+  <text x="75"  y="165" text-anchor="middle" dominant-baseline="middle" font-size="10" font-family="monospace" fill="white" font-weight="bold">x</text>
+  <text x="75"  y="245" text-anchor="middle" dominant-baseline="middle" font-size="10" font-family="monospace" fill="white" font-weight="bold">x</text>
+
+  <text x="180" y="105" text-anchor="middle" dominant-baseline="middle" font-size="9"  font-family="monospace" fill="white">σ</text>
+  <text x="180" y="185" text-anchor="middle" dominant-baseline="middle" font-size="9"  font-family="monospace" fill="white">σ</text>
+  <text x="180" y="265" text-anchor="middle" dominant-baseline="middle" font-size="9"  font-family="monospace" fill="white">σ</text>
+
+  <text x="300" y="135" text-anchor="middle" dominant-baseline="middle" font-size="9"  font-family="monospace" fill="white">ŷ</text>
+  <text x="300" y="235" text-anchor="middle" dominant-baseline="middle" font-size="9"  font-family="monospace" fill="white">ŷ</text>
+
+  <text x="380" y="183" text-anchor="middle" dominant-baseline="middle" font-size="9"  font-family="monospace" fill="#1C1917" font-weight="bold">L</text>
+
+  <!-- ── Layer labels ── -->
+  <text x="75"  y="282" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#93C5FD" opacity="0.8">Input</text>
+  <text x="180" y="282" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#C4B5FD" opacity="0.8">Hidden</text>
+  <text x="300" y="282" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#6EE7B7" opacity="0.8">Output</text>
+  <text x="380" y="207" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#FCD34D" opacity="0.8">Loss</text>
+
+  <!-- ── ∂L/∂w label on backprop arrow ── -->
+  <text x="228" y="152" font-size="9" font-family="monospace" fill="#FCD34D" opacity="0.6" transform="rotate(-18 228 152)">∂L/∂w</text>
+</svg>
