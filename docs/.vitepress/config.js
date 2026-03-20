@@ -1,6 +1,17 @@
 import { defineConfig } from 'vitepress'
+import { getThemeConfig } from '@sugarat/theme/node'
+
+const blogTheme = getThemeConfig({
+  author: 'BriceLucifer',
+  comment: false,
+  recommend: false,
+  article: {
+    readingTime: false,
+  },
+})
 
 export default defineConfig({
+  extends: blogTheme,
   title: 'MiniTorchBR',
   description: 'A lightweight autograd framework for AI training',
   base: '/MiniTorch/',
