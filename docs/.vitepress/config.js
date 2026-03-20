@@ -3,10 +3,10 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'MiniTorchBR',
   description: 'A lightweight autograd framework for AI training',
-  base: '/minitorchbr/',
+  base: '/MiniTorch/',
 
   head: [
-    ['link', { rel: 'icon', href: '/minitorchbr/favicon.ico' }]
+    ['link', { rel: 'icon', href: '/MiniTorch/favicon.ico' }]
   ],
 
   themeConfig: {
@@ -18,9 +18,9 @@ export default defineConfig({
       { text: 'API', link: '/api/core' },
       { text: 'Examples', link: '/examples/basic-autograd' },
       {
-        text: 'v0.3.1',
+        text: 'v0.3.2',
         items: [
-          { text: 'Changelog', link: 'https://github.com/BriceLucifer/minitorchbr/releases' },
+          { text: 'Changelog', link: 'https://github.com/BriceLucifer/MiniTorch/releases' },
           { text: 'PyPI', link: 'https://pypi.org/project/minitorchbr/' }
         ]
       }
@@ -63,7 +63,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/BriceLucifer/minitorchbr' }
+      { icon: 'github', link: 'https://github.com/BriceLucifer/MiniTorch' }
     ],
 
     footer: {
