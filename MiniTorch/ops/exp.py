@@ -27,4 +27,4 @@ def exp(x):
         return:
             Variable
     """
-    return Exp()([x])
+    return Exp()(x)
