@@ -1,9 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+import numpy as np
+
 from MiniTorch.core.function import Function
 from MiniTorch.utils.type_check import as_array
 
+if TYPE_CHECKING:
+    from MiniTorch.core.variable import Variable
+
 
 class Add(Function):
-    def forward(self, x0, x1):  # type: ignore[override]
+    def forward(self, x0: np.ndarray, x1: np.ndarray) -> np.ndarray:  # type: ignore[override]
         """
         params:
             xs: a list of inputs data
@@ -14,7 +23,7 @@ class Add(Function):
         y = x0 + x1
         return y
 
-    def backward(self, gy):  # type: ignore[override]
+    def backward(self, gy: Variable) -> tuple[Variable, Variable]:  # type: ignore[override]
         """
         params:
             gy: a grad based on additon rule
@@ -31,6 +40,6 @@ class Add(Function):
         return gx0, gx1
 
 
-def add(x0, x1):
-    x1 = as_array(x1)
-    return Add()(x0, x1)
+def add(x0: Variable, x1: Variable | float | int) -> Variable:
+    x1_arr = as_array(x1)
+    return Add()(x0, x1_arr)  # type: ignore[return-value]

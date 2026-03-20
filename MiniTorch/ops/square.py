@@ -1,9 +1,14 @@
-from typing import override
+from __future__ import annotations
 
-import numpy.typing as npt
+from typing import TYPE_CHECKING
 
-from MiniTorch.core import Function, Variable
+import numpy as np
+
+from MiniTorch.core import Function
 from MiniTorch.utils.type_check import as_array
+
+if TYPE_CHECKING:
+    from MiniTorch.core.variable import Variable
 
 
 class Square(Function):
@@ -11,20 +16,20 @@ class Square(Function):
     implement a Square Function based on Funtion object
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
-    def forward(self, x):  # type: ignore[override]
+    def forward(self, x: np.ndarray) -> np.ndarray:  # type: ignore[override]
         return x**2
 
-    def backward(self, gy):  # type: ignore[override]
-        x = self.inputs[0].data  # type: ignore
-        gx = 2 * x * gy
-        return gx
+    def backward(self, gy: Variable) -> Variable:  # type: ignore[override]
+        x = self.inputs[0].data  # type: ignore[index, union-attr]
+        gx = 2 * x * gy  # type: ignore[operator]
+        return gx  # type: ignore[return-value]
 
 
 # more easy to use
-def square(x):
+def square(x: Variable) -> Variable:
     """
     square():
         params:
@@ -32,4 +37,4 @@ def square(x):
         return:
             Variable
     """
-    return Square()(x)
+    return Square()(x)  # type: ignore[return-value]

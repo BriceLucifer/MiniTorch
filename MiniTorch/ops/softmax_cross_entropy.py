@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 
 from MiniTorch.core.function import Function
@@ -14,7 +16,7 @@ class SoftmaxCrossEntropy(Function):
     returns scalar loss.
     """
 
-    def forward(self, x, t):
+    def forward(self, x: np.ndarray, t: np.ndarray) -> np.ndarray:  # type: ignore[override]
         N = x.shape[0]
         # Log-softmax (subtract max for numerical stability)
         x_s = x - x.max(axis=1, keepdims=True)
@@ -23,13 +25,13 @@ class SoftmaxCrossEntropy(Function):
         loss = -log_p[np.arange(N), t_int].sum() / np.float64(N)
         return loss
 
-    def backward(self, gy):
-        x, t = self.inputs
-        N, C = x.data.shape
-        t_int = t.data.ravel().astype(int)
+    def backward(self, gy: Variable) -> tuple[Variable, None]:  # type: ignore[override]
+        x, t = self.inputs  # type: ignore[misc]
+        N, C = x.data.shape  # type: ignore[union-attr]
+        t_int = t.data.ravel().astype(int)  # type: ignore[union-attr]
 
         # Recompute softmax from stored input
-        x_data = x.data
+        x_data: np.ndarray = x.data  # type: ignore[union-attr, assignment]
         x_s = x_data - x_data.max(axis=1, keepdims=True)
         softmax = np.exp(x_s) / np.exp(x_s).sum(axis=1, keepdims=True)
 
@@ -42,5 +44,5 @@ class SoftmaxCrossEntropy(Function):
         return Variable(dx), None
 
 
-def softmax_cross_entropy(x, t):
-    return SoftmaxCrossEntropy()(x, t)
+def softmax_cross_entropy(x: Variable, t: Variable) -> Variable:
+    return SoftmaxCrossEntropy()(x, t)  # type: ignore[return-value]
