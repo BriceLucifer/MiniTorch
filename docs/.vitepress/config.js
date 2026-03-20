@@ -6,11 +6,11 @@ export default defineConfig({
   base: '/MiniTorch/',
 
   head: [
-    ['link', { rel: 'icon', href: '/MiniTorch/favicon.ico' }]
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/MiniTorch/logo.svg' }]
   ],
 
   themeConfig: {
-    logo: null,
+    logo: '/logo.svg',
     siteTitle: 'MiniTorchBR',
 
     nav: [
