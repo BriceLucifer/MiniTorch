@@ -291,5 +291,5 @@ MIT
 
 ## Acknowledgments
 
-MiniTorch is inspired by PyTorch and [DezeroBook](https://github.com/oreilly-japan/deep-learning-from-scratch-3).
+MiniTorch is inspired by PyTorch.
 Built as a teaching tool to understand automatic differentiation and deep learning frameworks from first principles — every line is readable NumPy.
