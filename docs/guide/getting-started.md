@@ -2,7 +2,8 @@
 
 ## Installation
 
-MiniTorchBR is available on PyPI and requires Python 3.10+.
+MiniTorchBR is available on PyPI and requires Python 3.10+. Release wheels
+target Linux x86-64, Windows x64, and 64-bit Intel/Apple silicon macOS.
 
 ```bash
 pip install minitorchbr

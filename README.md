@@ -26,7 +26,8 @@ practical API for experiments.
 
 ## Install
 
-Python 3.10 or newer is required.
+Python 3.10 or newer is required. Release wheels target Linux x86-64,
+Windows x64, and 64-bit Intel/Apple silicon macOS.
 
 ```bash
 pip install minitorchbr
