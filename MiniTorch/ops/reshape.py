@@ -23,6 +23,9 @@ class Reshape(Function):
     def backward(self, gy: Variable) -> Variable:  # type: ignore[override]
         return reshape(gy, self.x_shape)
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        return gy.reshape(self.x_shape)
+
 
 def reshape(x: Variable, shape: tuple[int, ...]) -> Variable:
     if x.shape == shape:

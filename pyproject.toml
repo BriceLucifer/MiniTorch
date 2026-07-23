@@ -1,10 +1,10 @@
 [project]
 name = "minitorchbr"
-version = "0.3.2"
-description = "A lightweight autograd framework for AI training, with nn layers, optimizers, structured graph visualization, and MNIST support"
+version = "0.4.0"
+description = "A fast NumPy autograd framework with neural-network layers, optimizers, and interactive model visualization"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "BriceLucifer"}
 ]
@@ -14,7 +14,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Education",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -38,19 +37,35 @@ Repository = "https://github.com/BriceLucifer/MiniTorch"
 Issues = "https://github.com/BriceLucifer/MiniTorch/issues"
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = [
+    "setuptools>=77",
+    "wheel",
+    "Cython>=3.1",
+    "numpy>=2.0",
+]
+build-backend = "setuptools.build_meta"
 
-[tool.hatch.build.targets.sdist]
-include = ["MiniTorch/**", "tests/**", "*.py", "*.md", "pyproject.toml"]
+[tool.setuptools.packages.find]
+include = ["MiniTorch*"]
 
-[tool.hatch.build.targets.wheel]
-packages = ["MiniTorch"]
+[tool.setuptools.package-data]
+"MiniTorch.visualization" = ["static/*.js", "static/*.css"]
+"MiniTorch.native" = ["*.pyx"]
 
 [dependency-groups]
 dev = [
-    "ty>=0.0.5",
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "mypy>=1.19.1",
 ]
+docs = [
+    "mkdocs>=1.6,<2",
+    "mkdocs-material>=9.6,<10",
+    "mkdocstrings[python]>=0.30,<1",
+]
+
+[tool.cibuildwheel]
+build = ["cp310-*", "cp311-*", "cp312-*", "cp313-*", "cp314-*"]
+skip = ["*-musllinux_*"]
+test-command = "pytest {project}/tests -q"
+test-requires = ["pytest>=7"]

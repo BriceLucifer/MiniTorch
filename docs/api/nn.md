@@ -1,100 +1,53 @@
-# nn API
+# Neural-network API
 
 ## Module
 
-```python
-from MiniTorch.nn.module import Module
-```
+`Module` discovers nested parameters, provides stable names for visualization,
+and supports compact model summaries.
 
-Base class for all neural network components.
-
-### `parameters() → list[Variable]`
-
-Returns a flat list of all learnable parameters in the module (and any sub-modules).
-
-```python
-model = Sequential(Linear(4, 8), Linear(8, 2))
-params = model.parameters()   # [w1, b1, w2, b2]
-```
-
-### `__call__(x)`
-
-Calls `forward(x)`. Build your computation graph here.
-
-### Custom Module Example
-
-```python
-import numpy as np
-from MiniTorch.core.variable import Variable
-from MiniTorch.nn.module import Module
-from MiniTorch.ops.relu import relu
-
-class TwoLayerNet(Module):
-    def __init__(self, in_dim, hidden, out_dim):
-        super().__init__()
-        self.fc1 = Linear(in_dim, hidden)
-        self.fc2 = Linear(hidden, out_dim)
-
-    def forward(self, x):
-        return self.fc2(relu(self.fc1(x)))
-```
-
----
+::: MiniTorch.nn.module.Module
+    options:
+      members:
+        - forward
+        - parameters
+        - named_parameters
+        - named_modules
+        - summary
+        - zero_grad
+      show_root_heading: true
 
 ## Linear
 
-```python
-from MiniTorch.nn.linear import Linear
-```
+::: MiniTorch.nn.linear.Linear
+    options:
+      members:
+        - forward
+      show_root_heading: true
 
-Fully-connected layer: `y = x @ W + b`
-
-### Constructor
-
-```python
-Linear(in_features: int, out_features: int, bias: bool = True)
-```
-
-Parameters are initialized with Kaiming uniform.
-
-### Attributes
-
-| Attribute | Shape | Description |
-|-----------|-------|-------------|
-| `weight` | `(in_features, out_features)` | Weight matrix |
-| `bias` | `(out_features,)` | Bias vector |
-
-### Example
-
-```python
-layer = Linear(128, 64)
-out = layer(x)   # x: (batch, 128) → out: (batch, 64)
-```
-
----
+Weights use He initialization and `float32` by default.
 
 ## Sequential
 
-```python
-from MiniTorch.nn.sequential import Sequential
-```
+::: MiniTorch.nn.sequential.Sequential
+    options:
+      members:
+        - forward
+        - parameters
+      show_root_heading: true
 
-Chains modules in order. Input is passed through each layer sequentially.
+## Activation modules
 
-### Constructor
+`ReLU`, `Sigmoid`, and `Tanh` wrap their matching differentiable operations so
+they can be placed directly inside `Sequential`.
 
-```python
-Sequential(*layers)
-```
+::: MiniTorch.nn.activations.ReLU
+    options:
+      show_root_heading: true
 
-### Example
+::: MiniTorch.nn.activations.Sigmoid
+    options:
+      show_root_heading: true
 
-```python
-model = Sequential(
-    Linear(784, 256),
-    Linear(256, 128),
-    Linear(128, 10),
-)
-
-logits = model(x_batch)
-```
+::: MiniTorch.nn.activations.Tanh
+    options:
+      show_root_heading: true

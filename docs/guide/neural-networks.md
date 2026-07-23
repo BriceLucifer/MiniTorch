@@ -38,12 +38,13 @@ out = layer(x)  # x shape: (batch, 784) → out shape: (batch, 128)
 Chain layers in order:
 
 ```python
-from MiniTorch.nn.sequential import Sequential
-from MiniTorch.nn.linear import Linear
+from MiniTorch.nn import Linear, ReLU, Sequential
 
 model = Sequential(
     Linear(784, 256),
+    ReLU(),
     Linear(256, 128),
+    ReLU(),
     Linear(128, 10)
 )
 
@@ -66,9 +67,9 @@ h = relu(layer(x))
 ### Mean Squared Error
 
 ```python
-from MiniTorch.ops.mse import mse_loss
+from MiniTorch.ops import mean_squared_error
 
-loss = mse_loss(predictions, targets)
+loss = mean_squared_error(predictions, targets)
 ```
 
 ### Softmax Cross-Entropy
@@ -82,29 +83,27 @@ loss = softmax_cross_entropy(logits, labels)  # labels: integer class indices
 ## Training Loop
 
 ```python
-import numpy as np
-from MiniTorch.nn.sequential import Sequential
-from MiniTorch.nn.linear import Linear
-from MiniTorch.ops.relu import relu
-from MiniTorch.ops.softmax_cross_entropy import softmax_cross_entropy
-from MiniTorch.optim.adam import Adam
+from MiniTorch import Variable
+from MiniTorch.nn import Linear, ReLU, Sequential
+from MiniTorch.ops import softmax_cross_entropy
+from MiniTorch.optim import Adam
 
 # Build model
-model = Sequential(Linear(784, 256), Linear(256, 10))
+model = Sequential(Linear(784, 256), ReLU(), Linear(256, 10))
 optimizer = Adam(model.parameters(), lr=1e-3)
 
 for epoch in range(10):
     for x_batch, y_batch in dataloader:
         # Forward
-        logits = model(x_batch)
-        loss = softmax_cross_entropy(logits, y_batch)
+        logits = model(Variable(x_batch))
+        loss = softmax_cross_entropy(logits, Variable(y_batch))
 
         # Backward
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
-    print(f"Epoch {epoch+1}  loss={loss.data:.4f}")
+    print(f"Epoch {epoch+1}  loss={loss.data.item():.4f}")
 ```
 
 ## Accessing Parameters

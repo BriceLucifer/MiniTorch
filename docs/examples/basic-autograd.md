@@ -17,8 +17,8 @@ b = Variable(np.array(3.0))
 f = a ** 2 + a * b
 f.backward()
 
-print(a.grad)  # 7.0
-print(b.grad)  # 2.0
+print(a.grad.data)  # 7.0
+print(b.grad.data)  # 2.0
 ```
 
 ## Vector Gradients
@@ -28,7 +28,7 @@ x = Variable(np.array([1.0, 2.0, 3.0]))
 y = (x ** 2).sum()   # y = sum(x_i^2),  dy/dx_i = 2*x_i
 y.backward()
 
-print(x.grad)  # [2. 4. 6.]
+print(x.grad.data)  # [2. 4. 6.]
 ```
 
 ## Matrix Operations
@@ -58,17 +58,17 @@ y = sigmoid(h)
 loss = y.sum()
 loss.backward()
 
-print(x.grad)
+print(x.grad.data)
 ```
 
 ## Verifying Gradients Numerically
 
 ```python
-from MiniTorch.utils.numer_diff import numerical_gradient_check
+from MiniTorch import numerical_diff
 from MiniTorch.ops.relu import relu
 
 x = Variable(np.random.randn(3, 3))
-numerical_gradient_check(relu, [x])   # raises if analytical ≠ finite-diff
+approximate = numerical_diff(relu, x)
 ```
 
 ## Inference Mode (no_grad)

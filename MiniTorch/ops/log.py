@@ -18,6 +18,9 @@ class Log(Function):
         x, = self.inputs  # type: ignore[misc]
         return gy / x  # type: ignore[return-value]
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        return gy / self.input_data(0)
+
 
 def log(x: Variable) -> Variable:
     return Log()(x)  # type: ignore[return-value]

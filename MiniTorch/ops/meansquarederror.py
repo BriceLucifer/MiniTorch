@@ -23,6 +23,11 @@ class MeanSquaredError(Function):
         gx1 = -gx0
         return gx0, gx1
 
+    def backward_array(self, gy: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        diff = self.input_data(0) - self.input_data(1)
+        gx0 = gy * diff * (2.0 / len(diff))
+        return gx0, -gx0
+
 
 def mean_squared_error(x0: Variable, x1: Variable) -> Variable:
     return MeanSquaredError()(x0, x1)  # type: ignore[return-value]

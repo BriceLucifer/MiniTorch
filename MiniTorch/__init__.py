@@ -23,15 +23,7 @@ from MiniTorch.ops import (
     tanh,
     transpose,
 )
-from MiniTorch.utils import (
-    as_array,
-    numerical_diff,
-    plot_confusion_matrix,
-    plot_predictions,
-    plot_training_history,
-    plot_weight_histograms,
-    visualize_graph,
-)
+from MiniTorch.utils import as_array, numerical_diff
 
 __all__ = [
     # Core
@@ -75,4 +67,27 @@ __all__ = [
     "plot_predictions",
     "plot_weight_histograms",
     "plot_confusion_matrix",
+    "visualize",
 ]
+
+
+def __getattr__(name: str):
+    """Keep the core import lightweight by lazily loading visual tools."""
+    if name == "visualize_graph":
+        from MiniTorch.utils.visualize import visualize_graph
+
+        return visualize_graph
+    if name == "visualize":
+        from MiniTorch.visualization import visualize
+
+        return visualize
+    if name in {
+        "plot_training_history",
+        "plot_predictions",
+        "plot_weight_histograms",
+        "plot_confusion_matrix",
+    }:
+        from MiniTorch.utils import training_viz
+
+        return getattr(training_viz, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

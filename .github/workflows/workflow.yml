@@ -1,60 +1,92 @@
-name: CI / Publish
+name: CI
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  release:
-    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  # ── Run tests on every push / PR ──────────────────────────────────────────
   test:
-    name: Test · Python ${{ matrix.python-version }}
+    name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@v8
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
 
-      - name: Set up Python ${{ matrix.python-version }}
-        run: uv python install ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: uv sync --all-extras
+      - name: Install project
+        run: uv sync --locked --dev
 
       - name: Run tests
-        run: uv run pytest tests/ -v --tb=short
+        run: uv run pytest tests/ -q
 
-  # ── Publish to PyPI when a GitHub Release is published ────────────────────
-  publish:
-    name: Publish to PyPI
+  quality:
+    name: Static checks and package build
     runs-on: ubuntu-latest
-    needs: test                   # only publish if tests pass
-    if: github.event_name == 'release' && github.event.action == 'published'
-
-    environment:
-      name: pypi
-      url: https://pypi.org/project/minitorchbr/
-
-    permissions:
-      id-token: write             # required for OIDC trusted publishing
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v8
+        with:
+          enable-cache: true
 
-      - name: Build package
+      - name: Install project
+        run: uv sync --locked --dev
+
+      - name: Type-check Python
+        run: uv run mypy MiniTorch
+
+      - name: Build source and wheel
         run: uv build
 
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Inspect distributions
+        run: uv run --with twine twine check dist/*
+
+  viewer:
+    name: Model viewer
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: lib/graph-viewer
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: lib/graph-viewer/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Verify production build
+        run: npm run build
+
+      - name: Ensure generated assets are committed
+        working-directory: .
+        run: git diff --exit-code -- MiniTorch/visualization/static

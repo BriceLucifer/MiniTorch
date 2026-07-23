@@ -21,6 +21,11 @@ class MatMul(Function):
         gW = matmul(x.T, gy)
         return gx, gW
 
+    def backward_array(self, gy: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        x = self.input_data(0)
+        weight = self.input_data(1)
+        return gy.dot(weight.T), x.T.dot(gy)
+
 
 def matmul(x: Variable, W: Variable) -> Variable:
     return MatMul()(x, W)  # type: ignore[return-value]

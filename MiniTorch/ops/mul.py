@@ -26,6 +26,17 @@ class Mul(Function):
             gx1 = sum_to(gx1, x1.shape)
         return gx0, gx1
 
+    def backward_array(self, gy: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        from MiniTorch.utils.sumto import sumto
+
+        x0, x1 = self.inputs  # type: ignore[misc]
+        gx0 = gy * self.input_data(1)
+        gx1 = gy * self.input_data(0)
+        if x0.shape != x1.shape:
+            gx0 = sumto(gx0, x0.shape)
+            gx1 = sumto(gx1, x1.shape)
+        return gx0, gx1
+
 
 def mul(x0: Variable, x1: Variable | float | int) -> Variable:
     x1_arr = as_array(x1)

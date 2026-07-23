@@ -19,6 +19,9 @@ class ReLU(Function):
         mask = (x.data > 0).astype(x.data.dtype)  # type: ignore[union-attr, operator]
         return gy * mask  # type: ignore[return-value]
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        return gy * (self.input_data(0) > 0)
+
 
 def relu(x: Variable) -> Variable:
     return ReLU()(x)  # type: ignore[return-value]

@@ -37,7 +37,8 @@ class SGD:
             g: np.ndarray = p.grad.data  # type: ignore[assignment]
             if self.weight_decay != 0:
                 g = g + self.weight_decay * p.data  # type: ignore[operator]
-            v[:] = self.momentum * v + g
+            v *= self.momentum
+            v += g
             p.data -= self.lr * v  # type: ignore[operator]
 
     def zero_grad(self) -> None:

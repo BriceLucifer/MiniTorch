@@ -29,6 +29,19 @@ class Div(Function):
 
         return gx0, gx1
 
+    def backward_array(self, gy: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        from MiniTorch.utils.sumto import sumto
+
+        x0, x1 = self.inputs  # type: ignore[misc]
+        x0_data = self.input_data(0)
+        x1_data = self.input_data(1)
+        gx0 = gy / x1_data
+        gx1 = gy * (-x0_data / x1_data**2)
+        if x0.shape != x1.shape:
+            gx0 = sumto(gx0, x0.shape)
+            gx1 = sumto(gx1, x1.shape)
+        return gx0, gx1
+
 
 def div(x0: Variable, x1: Variable | float | int) -> Variable:
     x1_arr = as_array(x1)

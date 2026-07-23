@@ -1,102 +1,57 @@
 # Core API
 
+The core package contains the tensor object and operation base class used by
+every differentiable computation.
+
 ## Variable
 
-```python
-from MiniTorch.core.variable import Variable
-```
-
-The fundamental tensor class with automatic differentiation support.
-
-### Constructor
+`Variable` wraps a NumPy array, stores an optional accumulated gradient, and
+points to the `Function` that produced it.
 
 ```python
-Variable(data, requires_grad=True)
+import numpy as np
+from MiniTorch import Variable
+
+x = Variable(np.array([1.0, 2.0], dtype=np.float32), name="x")
+loss = (x ** 2).sum()
+loss.backward()
 ```
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `data` | `np.ndarray` | The tensor data |
-| `requires_grad` | `bool` | Enable gradient tracking (default `True`) |
+!!! note
 
-### Attributes
+    MiniTorch gradients are themselves `Variable` objects. Read the raw array
+    through `x.grad.data`.
 
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `data` | `np.ndarray` | Raw NumPy array |
-| `grad` | `np.ndarray \| None` | Accumulated gradient |
-| `shape` | `tuple` | Shape of the underlying array |
-| `creator` | `Function \| None` | Op that created this variable |
-
-### Methods
-
-#### `.backward(grad=None)`
-
-Triggers reverse-mode autodiff from this variable.
-
-```python
-loss.backward()          # grad defaults to ones
-loss.backward(np.ones((1,)))
-```
-
-#### `.zero_grad()`
-
-Resets `.grad` to `None`.
-
-#### Operator Overloads
-
-`Variable` supports standard Python operators which dispatch to the corresponding `Function`:
-
-| Operator | Function |
-|----------|----------|
-| `a + b` | `Add` |
-| `a - b` | `Sub` |
-| `a * b` | `Mul` |
-| `a / b` | `Div` |
-| `a ** n` | `Pow` |
-| `a @ b` | `MatMul` |
-| `-a` | `Neg` |
-
----
+::: MiniTorch.core.variable.Variable
+    options:
+      members:
+        - backward
+        - clear_grad
+        - reshape
+        - T
+      show_root_heading: true
 
 ## Function
 
-```python
-from MiniTorch.core.function import Function
-```
+Subclass `Function` to implement a differentiable operation. The ordinary
+first-order path can provide `backward_array` to propagate raw NumPy arrays
+without building another autograd graph.
 
-Base class for all differentiable operations.
+::: MiniTorch.core.function.Function
+    options:
+      members:
+        - forward
+        - backward
+        - input_data
+        - output_data
+      show_root_heading: true
 
-### Implementing a Custom Op
+## Gradient configuration
 
-```python
-class MyOp(Function):
-    def forward(self, x: np.ndarray) -> np.ndarray:
-        self.save_for_backward(x)
-        return np.tanh(x)
+::: MiniTorch.core.config.no_grad
+    options:
+      show_root_heading: true
 
-    def backward(self, grad_output: np.ndarray):
-        (x,) = self.saved_tensors
-        return (1 - np.tanh(x) ** 2) * grad_output
-```
-
-### `save_for_backward(*tensors)`
-
-Stash NumPy arrays needed during the backward pass.
-
-### `saved_tensors`
-
-Retrieve stashed arrays in `.backward()`.
-
----
-
-## no_grad
-
-```python
-from MiniTorch.core.config import no_grad
-
-with no_grad():
-    y = model(x)   # no graph is built
-```
-
-Context manager that disables gradient tracking globally.
+::: MiniTorch.core.config.with_grad
+    options:
+      show_root_heading: true

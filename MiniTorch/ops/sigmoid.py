@@ -20,6 +20,10 @@ class Sigmoid(Function):
         y = self.outputs[0]()  # type: ignore[index]  # cached output
         return gy * y * (1 - y)  # type: ignore[return-value]
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        output = self.output_data(0)
+        return gy * output * (1 - output)
+
 
 def sigmoid(x: Variable) -> Variable:
     return Sigmoid()(x)  # type: ignore[return-value]

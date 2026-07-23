@@ -43,6 +43,19 @@ class SoftmaxCrossEntropy(Function):
         # Labels have no meaningful gradient
         return Variable(dx), None
 
+    def backward_array(
+        self, gy: np.ndarray, _label_grad: np.ndarray | None = None
+    ) -> tuple[np.ndarray, None]:
+        x = self.input_data(0)
+        labels = self.input_data(1)
+        n = x.shape[0]
+        label_indices = labels.ravel().astype(int)
+        shifted = x - x.max(axis=1, keepdims=True)
+        exp_shifted = np.exp(shifted)
+        softmax = exp_shifted / exp_shifted.sum(axis=1, keepdims=True)
+        softmax[np.arange(n), label_indices] -= 1
+        return softmax * gy / n, None
+
 
 def softmax_cross_entropy(x: Variable, t: Variable) -> Variable:
     return SoftmaxCrossEntropy()(x, t)  # type: ignore[return-value]

@@ -25,6 +25,10 @@ class Pow(Function):
         gx = c * x ** (c - 1) * gy
         return gx
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        x = self.input_data(0)
+        return self.c * x ** (self.c - 1) * gy
+
 
 def pow(x: Variable, c: float | int) -> Variable:
     return Pow(c)(x)  # type: ignore[return-value]

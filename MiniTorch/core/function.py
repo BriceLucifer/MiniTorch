@@ -41,3 +41,21 @@ class Function:
 
     def backward(self, *gys: Optional[Variable]) -> Any:
         raise NotImplementedError
+
+    def input_data(self, index: int) -> np.ndarray:
+        """Return a validated saved input for a raw NumPy backward kernel."""
+        if self.inputs is None:
+            raise RuntimeError("operation input data is no longer available")
+        data = self.inputs[index].data
+        if data is None:
+            raise RuntimeError("operation input data is no longer available")
+        return data
+
+    def output_data(self, index: int) -> np.ndarray:
+        """Return a validated output for a raw NumPy backward kernel."""
+        if self.outputs is None:
+            raise RuntimeError("operation output data is no longer available")
+        output = self.outputs[index]()
+        if output is None or output.data is None:
+            raise RuntimeError("operation output data is no longer available")
+        return output.data

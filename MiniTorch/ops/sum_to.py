@@ -29,6 +29,9 @@ class SumTo(Function):
         gx = broadcast_to(gy, self.x_shape)
         return gx
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        return np.broadcast_to(gy, self.x_shape)
+
 
 def sum_to(x: Variable, shape: tuple[int, ...]) -> Variable:
     if x.shape == shape:

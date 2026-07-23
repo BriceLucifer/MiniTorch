@@ -1,64 +1,100 @@
----
-layout: home
+# MiniTorch
 
-hero:
-  name: MiniTorchBR
-  text: Autograd from scratch
-  tagline: A lightweight PyTorch-inspired deep learning framework built on NumPy — learn how backpropagation really works.
-  image:
-    src: /hero.svg
-    alt: MiniTorchBR neural network computation graph
-  actions:
-    - theme: brand
-      text: Get Started
-      link: /guide/getting-started
-    - theme: alt
-      text: View on GitHub
-      link: https://github.com/BriceLucifer/MiniTorch
+<p class="lead">
+Fast NumPy autograd, compiled dense training, and inspectable neural networks.
+</p>
 
-features:
-  - icon: ⚡
-    title: Reverse-mode Autograd
-    details: Full automatic differentiation engine with dynamic computation graphs. Every operation tracks its gradient function for efficient backprop.
-  - icon: 🧠
-    title: Neural Network Modules
-    details: Familiar nn.Module API with Linear layers, Sequential containers, activation functions, and loss functions — just like PyTorch.
-  - icon: 🔧
-    title: Optimizers
-    details: SGD with momentum and Adam with bias correction, ready to train any model you build.
-  - icon: 📊
-    title: Rich Visualizations
-    details: Interactive HTML computation-graph rendering, training-curve plots, weight histograms, and confusion matrices out of the box.
-  - icon: 📦
-    title: Install with pip
-    details: Available on PyPI. Zero heavy dependencies — just NumPy, Matplotlib, and PyVis.
-  - icon: 🎓
-    title: Educational Design
-    details: Every module is readable source code. Ideal for learning or teaching the internals of modern deep learning frameworks.
----
+MiniTorch is a compact scientific-computing framework for learning and
+experimenting with reverse-mode automatic differentiation. Its Python surface
+stays readable while first-order backpropagation uses raw NumPy gradient kernels
+and static dense classifiers can move the complete training loop into compiled
+C.
 
-## Quick Install
+<div class="grid cards" markdown>
 
-```bash
-pip install minitorchbr
-```
+-   :material-lightning-bolt:{ .lg .middle } **Fast backpropagation**
 
-## 30-Second Example
+    ---
+
+    A linear-time reverse tape visits every graph node and edge once, without
+    constructing a second graph during ordinary first-order training.
+
+-   :material-language-c:{ .lg .middle } **Compiled training**
+
+    ---
+
+    Dense `Linear`/`ReLU` classifiers can run batching, forward, backward,
+    softmax cross-entropy, and Adam in generated C while NumPy calls BLAS.
+
+-   :material-graph-outline:{ .lg .middle } **Scientific model explorer**
+
+    ---
+
+    `visualize(model)` opens a self-contained full-neuron connection map.
+    Selecting a neuron shows only its latest value and gradient.
+
+</div>
+
+[Get started](guide/getting-started.md){ .md-button .md-button--primary }
+[Explore the model viewer](examples/visualization.md){ .md-button }
+
+## Thirty-second example
 
 ```python
 import numpy as np
-from MiniTorch.core.variable import Variable
 
-# Create tensors with gradient tracking
-x = Variable(np.array([[1.0, 2.0, 3.0]]))
-w = Variable(np.random.randn(3, 1))
+from MiniTorch import Variable
 
-# Forward pass — graph is built automatically
-y = x @ w          # matmul
-loss = (y ** 2).sum()
+x = Variable(np.array([[2.0]], dtype=np.float32), name="x")
+w = Variable(np.array([[3.0]], dtype=np.float32), name="w")
+b = Variable(np.array([[1.0]], dtype=np.float32), name="b")
 
-# Backward pass
+loss = (x * w + b - 10.0) ** 2
 loss.backward()
 
-print(w.grad)      # dL/dw computed via reverse-mode AD
+print(loss.data)    # [[9.]]
+print(w.grad.data)  # [[-12.]]
 ```
+
+## Choose a training path
+
+=== "Eager autograd"
+
+    Use eager execution for custom modules, dynamic Python control flow, new
+    operations, or higher-order gradients.
+
+    ```python
+    logits = model(Variable(features))
+    loss = softmax_cross_entropy(logits, Variable(labels))
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+    ```
+
+=== "Compiled dense loop"
+
+    Use the native loop for a static
+    `Sequential(Linear, ReLU, ..., Linear)` classifier.
+
+    ```python
+    from MiniTorch.native import train
+
+    history = train(
+        model,
+        x_train,
+        y_train,
+        epochs=15,
+        batch_size=128,
+        lr=1e-3,
+    )
+    ```
+
+## Inspect the trained network
+
+```python
+from MiniTorch import visualize
+
+visualize(model)
+```
+
+![MiniTorch scientific model explorer](assets/model-explorer.png)

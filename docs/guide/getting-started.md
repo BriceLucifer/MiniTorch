@@ -13,8 +13,12 @@ Or install from source:
 ```bash
 git clone https://github.com/BriceLucifer/MiniTorch.git
 cd MiniTorch
-pip install -e .
+uv venv
+uv sync
 ```
+
+Source installation compiles the optional native training extension and
+therefore requires a C/C++ build toolchain.
 
 ## Dependencies
 
@@ -32,6 +36,8 @@ MiniTorch/
 ├── ops/        # 20+ differentiable operations
 ├── nn/         # Module, Linear, Sequential
 ├── optim/      # SGD, Adam
+├── native/     # Compiled dense-classifier training
+├── visualization/ # Interactive model explorer
 ├── data/       # MNIST loader, DataLoader
 └── utils/      # Graph viz, training viz, numerical diff
 ```
@@ -49,8 +55,8 @@ b = Variable(np.array(3.0))
 c = a * b + a   # c = a*b + a  →  dc/da = b+1 = 4,  dc/db = a = 2
 c.backward()
 
-print(a.grad)   # 4.0
-print(b.grad)   # 2.0
+print(a.grad.data)   # 4.0
+print(b.grad.data)   # 2.0
 ```
 
 ## Disabling Gradient Tracking
@@ -66,6 +72,6 @@ with no_grad():
 
 ## Next Steps
 
-- [Autograd System](./autograd) — understand how the computation graph works
-- [Neural Networks](./neural-networks) — build and train models
-- [Examples](../examples/basic-autograd) — runnable code samples
+- [Autograd System](autograd.md) — understand how the computation graph works
+- [Neural Networks](neural-networks.md) — build and train models
+- [Examples](../examples/basic-autograd.md) — runnable code samples

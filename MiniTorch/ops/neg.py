@@ -17,6 +17,9 @@ class Neg(Function):
     def backward(self, gy: Variable) -> Variable:  # type: ignore[override]
         return -gy
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        return -gy
+
 
 def neg(x: Variable) -> Variable:
     return Neg()(x)  # type: ignore[return-value]

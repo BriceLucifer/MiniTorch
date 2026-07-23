@@ -1,81 +1,135 @@
-# Graph Visualization
+# Model Visualization
 
-MiniTorchBR can render the computation graph as an interactive HTML file using PyVis.
+MiniTorch includes an interactive neural-network explorer built with React
+Flow. It renders every dense-layer neuron and the complete connection mesh in a
+standalone HTML file.
 
-## Basic Graph Rendering
+![MiniTorch model explorer](../assets/model-explorer.png)
+
+Run the repository example from the project root:
+
+```bash
+uv run python examples/model_visualization.py
+```
+
+## Visualize a model
 
 ```python
 import numpy as np
-from MiniTorch.core.variable import Variable
-from MiniTorch.utils.visualize import visualize_graph
 
-x = Variable(np.array([1.0, 2.0]))
-w = Variable(np.array([0.5, -0.5]))
+from MiniTorch import Variable, sum as tensor_sum
+from MiniTorch import visualize
+from MiniTorch.nn import Linear, ReLU, Sequential
 
+model = Sequential(
+    Linear(784, 256),
+    ReLU(),
+    Linear(256, 128),
+    ReLU(),
+    Linear(128, 10),
+)
+
+# Capture a concrete activation value and retain its backward gradient.
+probe = Variable(np.random.default_rng(7).normal(size=(1, 784)).astype(np.float32))
+probe_output = model(probe)
+probe_loss = tensor_sum(probe_output)
+probe_loss.backward(retain_grad=True)
+
+visualize(model)
+```
+
+This creates `model_architecture.html` and opens it in the default browser.
+
+Use a custom path or prevent automatic opening:
+
+```python
+result = visualize(
+    model,
+    filename="artifacts/mnist-model.html",
+    input_shape=(None, 784),
+    open_browser=False,
+)
+
+print(result.path)
+```
+
+The neuron map supports:
+
+- every neuron in each `Linear` layer, without sampling;
+- every dense connection, rendered efficiently on a canvas;
+- a separate compact architecture section;
+- map-style dragging, wheel/pinch zooming, zoom controls, and scrollbars;
+- a clean black scientific theme;
+- independent collapse buttons for the architecture and neuron inspector;
+- a two-field inspector containing only the selected neuron's `Value` and
+  `Grad`.
+
+Large networks extend the scrollable canvas. Zoom out for an overview, zoom in
+to read labels, and drag or scroll to move through all neurons.
+
+Select a circle to inspect it. `Value` is the mean activation for that neuron
+over the most recent eager batch. `Grad` is the corresponding mean activation
+gradient.
+
+Intermediate activation gradients are released by the default fast backward
+path. Pass `retain_grad=True` when preparing a model for inspection:
+
+```python
+prediction = model(Variable(x_sample))
+loss = tensor_sum(prediction)
+loss.backward(retain_grad=True)
+visualize(model)
+```
+
+## Model-size independence
+
+The exporter reads the supplied module tree and parameter shapes; it does not
+assume a particular example architecture. For instance:
+
+```python
+from MiniTorch import visualize
+from MiniTorch.nn import Linear, Sequential
+
+small_model = Sequential(Linear(10, 1))
+visualize(small_model, filename="small-model.html")
+```
+
+That page contains exactly 10 input neurons, one output neuron, and 10
+connections. Deeper `Sequential` dense models add one full neuron column for
+each `Linear` layer.
+
+## Rebuild the viewer
+
+The packaged viewer is already included for Python users. Frontend contributors
+can rebuild it after changing `lib/graph-viewer`:
+
+```bash
+cd lib/graph-viewer
+npm ci
+npm run typecheck
+npm run build
+```
+
+Vite writes the production bundle to `MiniTorch/visualization/static`. Commit
+the updated JavaScript and CSS so `visualize(model)` continues to work without
+Node.js at runtime.
+
+## Computation graph debugging
+
+The lower-level autograd graph viewer remains available:
+
+```python
+import numpy as np
+
+from MiniTorch import Variable, visualize_graph
+
+x = Variable(np.array([1.0, 2.0]), name="x")
+w = Variable(np.array([0.5, -0.5]), name="w")
 y = (x * w).sum()
-y.backward()
+y.backward(retain_grad=True)
 
-# Renders an interactive HTML file
-visualize_graph(y, output_path="graph.html")
+visualize_graph(y, filename="autograd-graph.html")
 ```
 
-Open `graph.html` in any browser. Nodes represent variables and edges represent operations. You can drag, zoom, and hover for details.
-
-## Larger Network Graph
-
-```python
-from MiniTorch.nn.linear import Linear
-from MiniTorch.ops.relu import relu
-from MiniTorch.ops.softmax_cross_entropy import softmax_cross_entropy
-
-x_np = np.random.randn(4, 8)
-x = Variable(x_np)
-
-fc1 = Linear(8, 4)
-fc2 = Linear(4, 2)
-
-h = relu(fc1(x))
-logits = fc2(h)
-loss = softmax_cross_entropy(logits, np.array([0, 1, 0, 1]))
-loss.backward()
-
-visualize_graph(loss, output_path="network_graph.html")
-```
-
-## Training Curves
-
-```python
-from MiniTorch.utils.training_viz import plot_training_history
-
-history = {
-    "train_loss": [0.95, 0.72, 0.55, 0.42, 0.34],
-    "val_loss":   [0.98, 0.75, 0.58, 0.46, 0.39],
-    "train_acc":  [0.65, 0.76, 0.83, 0.87, 0.90],
-    "val_acc":    [0.63, 0.74, 0.81, 0.85, 0.88],
-}
-
-plot_training_history(history)   # saves training_history.png
-```
-
-## Weight Histograms
-
-```python
-from MiniTorch.utils.training_viz import plot_weight_histograms
-
-plot_weight_histograms(model)    # saves weight_histograms.png
-```
-
-Histograms show the distribution of weights in each layer — useful for diagnosing vanishing/exploding gradients.
-
-## Confusion Matrix
-
-```python
-from MiniTorch.utils.training_viz import plot_confusion_matrix
-import numpy as np
-
-y_true = np.array([0, 1, 2, 1, 0, 2])
-y_pred = np.array([0, 1, 2, 0, 0, 1])
-
-plot_confusion_matrix(y_true, y_pred, class_names=["cat", "dog", "bird"])
-# saves confusion_matrix.png
-```
+Use `visualize(model)` to understand model architecture and
+`visualize_graph(variable)` to debug an individual autograd computation.

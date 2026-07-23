@@ -29,6 +29,12 @@ class Sum(Function):
         gx = broadcast_to(gy, self.x_shape)
         return gx  # type: ignore[return-value]
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        gy = reshape_sum_backward(
+            gy, self.x_shape, self.axis, self.keepdims
+        )
+        return np.broadcast_to(gy, self.x_shape)
+
 
 def sum(
     x: Variable,

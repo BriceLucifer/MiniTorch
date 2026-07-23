@@ -25,6 +25,9 @@ class Exp(Function):
         x = self.inputs[0].data  # type: ignore[index, union-attr]
         return np.exp(x) * gy  # type: ignore[return-value, arg-type]
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        return self.output_data(0) * gy
+
 
 def exp(x: Variable) -> Variable:
     """

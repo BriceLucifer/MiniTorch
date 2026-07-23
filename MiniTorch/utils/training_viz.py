@@ -128,7 +128,7 @@ def plot_predictions(
     y_true   = y_test[indices]
 
     with no_grad():
-        logits = model(Variable(x_sample.astype(np.float64)))
+        logits = model(Variable(x_sample.astype(np.float32, copy=False)))
         y_pred = np.argmax(logits.data, axis=1)
 
     cols = min(8, n_samples)
@@ -226,7 +226,7 @@ def plot_confusion_matrix(
     loader = DataLoader(x_test, y_test, batch_size=batch_size, shuffle=False)
     with no_grad():
         for xb, yb in loader:
-            logits = model(Variable(xb.astype(np.float64)))
+            logits = model(Variable(xb.astype(np.float32, copy=False)))
             preds = np.argmax(logits.data, axis=1)
             for t, p in zip(yb, preds):
                 cm[t, p] += 1

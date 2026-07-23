@@ -1,91 +1,84 @@
 # Training a Network
 
-A complete example training a two-layer MLP on synthetic data.
+MiniTorch provides an eager autograd loop for arbitrary models and a compiled
+loop for static dense classifiers.
 
-## Setup
+Run the complete synthetic compiled-training example:
 
-```python
-import numpy as np
-from MiniTorch.core.variable import Variable
-from MiniTorch.nn.sequential import Sequential
-from MiniTorch.nn.linear import Linear
-from MiniTorch.ops.relu import relu
-from MiniTorch.ops.mse import mse_loss
-from MiniTorch.optim.adam import Adam
+```bash
+uv run python examples/native_training.py
 ```
 
-## Synthetic Dataset
+## Eager autograd
 
 ```python
-np.random.seed(42)
-N = 200   # samples
+from MiniTorch import Variable
+from MiniTorch.nn import Linear, ReLU, Sequential
+from MiniTorch.ops import softmax_cross_entropy
+from MiniTorch.optim import Adam
 
-# Regression: y = sin(x1) + cos(x2)
-X_np = np.random.uniform(-np.pi, np.pi, (N, 2))
-y_np = np.sin(X_np[:, 0]) + np.cos(X_np[:, 1])
-y_np = y_np.reshape(-1, 1)
-```
-
-## Model & Optimizer
-
-```python
-class MLP(Sequential):
-    def forward(self, x):
-        h = relu(self.layers[0](x))
-        return self.layers[1](h)
-
-model = MLP(Linear(2, 64), Linear(64, 1))
+model = Sequential(
+    Linear(64, 128),
+    ReLU(),
+    Linear(128, 10),
+)
 optimizer = Adam(model.parameters(), lr=1e-3)
+
+for xb, yb in loader:
+    logits = model(Variable(xb))
+    loss = softmax_cross_entropy(logits, Variable(yb))
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
 ```
 
-## Training Loop
+The eager loop supports arbitrary MiniTorch operations, custom modules, dynamic
+Python model code, and higher-order differentiation.
+
+## Compiled NumPy training
+
+Static dense classifiers can move their epoch, batch, forward, backward, and
+Adam control loops into compiled C:
 
 ```python
-EPOCHS = 200
-BATCH  = 32
+from MiniTorch.native import train
+from MiniTorch.nn import Linear, ReLU, Sequential
 
-indices = np.arange(N)
+model = Sequential(
+    Linear(784, 256),
+    ReLU(),
+    Linear(256, 128),
+    ReLU(),
+    Linear(128, 10),
+)
 
-for epoch in range(EPOCHS):
-    np.random.shuffle(indices)
-    epoch_loss = 0.0
+history = train(
+    model,
+    x_train,
+    y_train,
+    epochs=15,
+    batch_size=128,
+    lr=1e-3,
+)
 
-    for start in range(0, N, BATCH):
-        idx = indices[start:start + BATCH]
-        x_batch = Variable(X_np[idx])
-        y_batch = Variable(y_np[idx])
-
-        pred = model(x_batch)
-        loss = mse_loss(pred, y_batch)
-
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        epoch_loss += float(loss.data)
-
-    if (epoch + 1) % 20 == 0:
-        print(f"Epoch {epoch+1:3d}  loss={epoch_loss:.4f}")
+print(history.losses)
 ```
 
-## Evaluation
+NumPy still executes matrix multiplication through its optimized native
+libraries. The C extension removes repeated Python model, operation,
+autograd-object, and optimizer dispatch from every mini-batch.
 
-```python
-from MiniTorch.core.config import no_grad
+The compiled path currently supports:
 
-with no_grad():
-    x_val = Variable(X_np[:20])
-    preds = model(x_val)
+- `nn.Sequential`;
+- alternating `Linear` and `ReLU` modules;
+- a final `Linear` classification layer;
+- float32 parameters and inputs;
+- integer class labels;
+- softmax cross-entropy and Adam.
 
-for pred, true in zip(preds.data.flatten(), y_np[:20].flatten()):
-    print(f"pred={pred:.3f}  true={true:.3f}")
-```
-
-## Training Visualization
-
-```python
-from MiniTorch.utils.training_viz import plot_training_history
-
-history = {"train_loss": [...], "val_loss": [...]}
-plot_training_history(history)
-```
+The model parameters are updated in place, and the last mini-batch parameter
+gradients remain available programmatically. The model explorer shows
+activation `Value` and `Grad`; run one eager probe with
+`backward(retain_grad=True)` before opening it. Use eager training for other
+architectures.

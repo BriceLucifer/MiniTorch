@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 class Variable:
     __array_priority__ = 200
+    __slots__ = ("data", "name", "grad", "creator", "generation", "__weakref__")
 
     def __init__(self, data: Optional[np.ndarray], name: Optional[str] = None) -> None:
         if data is not None:
@@ -112,37 +113,95 @@ class Variable:
         if self.grad is None:
             self.grad = Variable(np.ones_like(self.data))
 
-        funcs: list[Function] = []
-        seen_set: set[Function] = set()
+        if self.creator is None:
+            return
 
-        def add_func(f: Function) -> None:
-            if f not in seen_set:
-                funcs.append(f)
-                seen_set.add(f)
-                funcs.sort(key=lambda x: x.generation)
+        # Build a compact topological tape in O(functions + edges). Forward
+        # execution already defines a DAG, so backward can simply replay this
+        # tape in reverse instead of repeatedly sorting a ready list.
+        tape: list[Function] = []
+        discovered: set[Function] = set()
+        stack: list[tuple[Function, bool]] = [(self.creator, False)]
 
-        add_func(self.creator)  # type: ignore[arg-type]
+        while stack:
+            func, expanded = stack.pop()
+            if expanded:
+                tape.append(func)
+                continue
+            if func in discovered:
+                continue
+            discovered.add(func)
+            stack.append((func, True))
+            if func.inputs is not None:
+                for input_var in func.inputs:
+                    if input_var.creator is not None and input_var.creator not in discovered:
+                        stack.append((input_var.creator, False))
 
-        while funcs:
-            f = funcs.pop()
-            gys = [output().grad for output in f.outputs]  # type: ignore[union-attr, misc]
+        for func in reversed(tape):
+            if func.outputs is None or func.inputs is None:
+                continue
 
-            with using_config("enable_backprob", create_graph):
-                gxs = f.backward(*gys)
-                if not isinstance(gxs, tuple):
-                    gxs = (gxs,)
+            outputs = [output_ref() for output_ref in func.outputs]
+            if create_graph:
+                output_grads = [
+                    output.grad if output is not None else None
+                    for output in outputs
+                ]
+                with using_config("enable_backprob", True):
+                    input_grads = func.backward(*output_grads)
+                if not isinstance(input_grads, tuple):
+                    input_grads = (input_grads,)
 
-                for x, gx in zip(f.inputs, gxs):  # type: ignore[arg-type]
-                    if gx is None:
+                for input_var, grad in zip(func.inputs, input_grads):
+                    if grad is None:
                         continue
-                    if x.grad is None:
-                        x.grad = gx
+                    input_var.grad = grad if input_var.grad is None else input_var.grad + grad
+            else:
+                output_grad_arrays = [
+                    output.grad.data
+                    if output is not None and output.grad is not None
+                    else None
+                    for output in outputs
+                ]
+                array_backward = getattr(func, "backward_array", None)
+                try:
+                    if array_backward is None:
+                        raise NotImplementedError
+                    input_grad_arrays = array_backward(*output_grad_arrays)
+                except NotImplementedError:
+                    # Compatibility path for third-party operations that have
+                    # not implemented the raw-array training API yet.
+                    output_grads = [
+                        output.grad if output is not None else None
+                        for output in outputs
+                    ]
+                    with using_config("enable_backprob", False):
+                        legacy_grads = func.backward(*output_grads)
+                    if not isinstance(legacy_grads, tuple):
+                        legacy_grads = (legacy_grads,)
+                    input_grad_arrays = tuple(
+                        grad.data if isinstance(grad, Variable) else grad
+                        for grad in legacy_grads
+                    )
+
+                if not isinstance(input_grad_arrays, tuple):
+                    input_grad_arrays = (input_grad_arrays,)
+
+                for input_var, grad_array in zip(func.inputs, input_grad_arrays):
+                    if grad_array is None:
+                        continue
+                    grad_array = np.asarray(grad_array)
+                    if input_var.grad is None:
+                        input_var.grad = Variable(grad_array)
                     else:
-                        x.grad = x.grad + gx
+                        # Allocate the accumulation result instead of mutating
+                        # in place: some derivative rules intentionally return
+                        # aliased upstream gradients.
+                        input_var.grad.data = np.asarray(
+                            input_var.grad.data + grad_array
+                        )
 
-                    if x.creator is not None:
-                        add_func(x.creator)
-
-            if (not retain_grad) and (not create_graph):
-                for y in f.outputs:  # type: ignore[union-attr]
-                    y().grad = None  # type: ignore[misc]
+            if not retain_grad and not create_graph:
+                for output in outputs:
+                    if output is not None and output is not self:
+                        output.grad = None

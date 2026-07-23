@@ -26,6 +26,11 @@ class BroadcastTo(Function):
         gx = sum_to(gy, self.x_shape)
         return gx
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        from MiniTorch.utils.sumto import sumto
+
+        return sumto(gy, self.x_shape)
+
 
 def broadcast_to(x: Variable, shape: tuple[int, ...]) -> Variable:
     if x.shape == shape:

@@ -1,0 +1,102 @@
+site_name: MiniTorch
+site_description: Fast NumPy autograd, compiled dense training, and interactive model inspection
+site_url: https://bricelucifer.github.io/MiniTorch/
+repo_url: https://github.com/BriceLucifer/MiniTorch
+repo_name: BriceLucifer/MiniTorch
+edit_uri: edit/main/docs/
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: en
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  font:
+    text: Inter
+    code: JetBrains Mono
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Use dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Use light mode
+  features:
+    - content.code.copy
+    - content.code.select
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - toc.follow
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: ["."]
+          options:
+            docstring_section_style: list
+            heading_level: 2
+            merge_init_into_class: true
+            separate_signature: true
+            show_root_full_path: false
+            show_signature_annotations: true
+            show_source: true
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Overview: index.md
+  - Guide:
+      - Getting started: guide/getting-started.md
+      - Autograd internals: guide/autograd.md
+      - Neural networks: guide/neural-networks.md
+  - Training:
+      - Eager and compiled loops: examples/training.md
+      - MNIST classifier: examples/mnist.md
+  - Visualization: examples/visualization.md
+  - Examples:
+      - Basic autograd: examples/basic-autograd.md
+  - API reference:
+      - Core: api/core.md
+      - Neural network: api/nn.md
+      - Operations: api/ops.md
+      - Optimizers: api/optim.md
+      - Data: api/data.md
+      - Native training: api/native.md
+      - Visualization: api/visualization.md
+
+copyright: Copyright &copy; 2024 BriceLucifer

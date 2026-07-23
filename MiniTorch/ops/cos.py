@@ -22,6 +22,9 @@ class Cos(Function):
         gx = gy * -sin(x)  # type: ignore[operator]
         return gx
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        return -gy * np.sin(self.input_data(0))
+
 
 def cos(x: Variable) -> Variable:
     return Cos()(x)  # type: ignore[return-value]

@@ -20,6 +20,10 @@ class Tanh(Function):
         gx = gy * (1 - y * y)  # type: ignore[operator]
         return gx
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        output = self.output_data(0)
+        return gy * (1 - output * output)
+
 
 def tanh(x: Variable) -> Variable:
     return Tanh()(x)  # type: ignore[return-value]

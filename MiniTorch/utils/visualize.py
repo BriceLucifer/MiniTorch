@@ -26,7 +26,7 @@ from __future__ import annotations
 import textwrap
 
 import numpy as np
-from pyvis.network import Network
+from pyvis.network import Network  # type: ignore[import-untyped]
 
 
 # ─────────────────────────────────────────────────────────────────────────────

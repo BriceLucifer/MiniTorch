@@ -12,7 +12,7 @@ MiniTorchBR implements **reverse-mode automatic differentiation** (backpropagati
 from MiniTorch.core.variable import Variable
 import numpy as np
 
-x = Variable(np.array([1.0, 2.0, 3.0]), requires_grad=True)
+x = Variable(np.array([1.0, 2.0, 3.0]), name="x")
 ```
 
 Key attributes:
@@ -20,9 +20,9 @@ Key attributes:
 | Attribute | Description |
 |-----------|-------------|
 | `data` | The underlying NumPy array |
-| `grad` | Accumulated gradient (same shape as `data`) |
+| `grad` | Accumulated gradient as another `Variable` |
 | `creator` | The `Function` that produced this variable |
-| `requires_grad` | Whether to track gradients |
+| `generation` | Topological depth used while constructing the graph |
 
 ### Function
 
@@ -36,13 +36,17 @@ from MiniTorch.core.function import Function
 
 class MySquare(Function):
     def forward(self, x):
-        self.save_for_backward(x)
         return x ** 2
 
     def backward(self, grad_output):
-        (x,) = self.saved_tensors
-        return 2 * x * grad_output
+        return 2 * self.inputs[0] * grad_output
+
+    def backward_array(self, grad_output):
+        return 2 * self.input_data(0) * grad_output
 ```
+
+`backward` preserves a differentiable graph for higher-order derivatives.
+`backward_array` is the fast NumPy path used by ordinary first-order training.
 
 ## Computation Graph
 
@@ -74,8 +78,8 @@ loss = z.sum()   # scalar
 
 loss.backward()
 
-print(x.grad)    # [4. 5.]  (dL/dx = y)
-print(y.grad)    # [2. 3.]  (dL/dy = x)
+print(x.grad.data)    # [4. 5.]  (dL/dx = y)
+print(y.grad.data)    # [2. 3.]  (dL/dy = x)
 ```
 
 ## Gradient Accumulation
@@ -93,12 +97,13 @@ optimizer.step()
 Use the built-in checker to verify custom ops:
 
 ```python
-from MiniTorch.utils.numer_diff import numerical_gradient_check
+from MiniTorch import numerical_diff
 
-numerical_gradient_check(my_function, inputs)
+approximate = numerical_diff(my_function, x)
 ```
 
-This compares analytical gradients against finite differences and raises if they diverge beyond tolerance.
+Compare this finite-difference result with `x.grad.data` when implementing a
+new operation.
 
 ## no_grad Context
 

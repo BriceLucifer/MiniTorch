@@ -19,6 +19,9 @@ class Transpose(Function):
         gx = transpose(gy)
         return gx
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        return np.transpose(gy)
+
 
 def transpose(x: Variable) -> Variable:
     return Transpose()(x)  # type: ignore[return-value]

@@ -39,6 +39,15 @@ class Add(Function):
 
         return gx0, gx1
 
+    def backward_array(self, gy: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        from MiniTorch.utils.sumto import sumto
+
+        gx0, gx1 = gy, gy
+        if self.x0_shape != self.x1_shape:
+            gx0 = sumto(gx0, self.x0_shape)
+            gx1 = sumto(gx1, self.x1_shape)
+        return gx0, gx1
+
 
 def add(x0: Variable, x1: Variable | float | int) -> Variable:
     x1_arr = as_array(x1)

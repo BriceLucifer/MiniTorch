@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import weakref
+
 import numpy as np
 
 from MiniTorch.core.variable import Variable
@@ -18,23 +20,33 @@ class Linear(Module):
     bias         : whether to include a bias term (default True)
     """
 
-    def __init__(self, in_features: int, out_features: int, bias: bool = True) -> None:
+    def __init__(
+        self,
+        in_features: int,
+        out_features: int,
+        bias: bool = True,
+        dtype: np.dtype | type = np.float32,
+    ) -> None:
         scale = np.sqrt(2.0 / in_features)
         self.W = Variable(
-            (np.random.randn(in_features, out_features) * scale).astype(np.float64),
+            (np.random.randn(in_features, out_features) * scale).astype(dtype),
             name="W",
         )
         self.b: Variable | None = None
+        self._last_input_ref: weakref.ReferenceType[Variable] | None = None
+        self._last_output_ref: weakref.ReferenceType[Variable] | None = None
         if bias:
             self.b = Variable(
-                np.zeros(out_features, dtype=np.float64),
+                np.zeros(out_features, dtype=dtype),
                 name="b",
             )
 
     def forward(self, x: Variable) -> Variable:  # type: ignore[override]
+        self._last_input_ref = weakref.ref(x)
         y = matmul(x, self.W)
         if self.b is not None:
             y = y + self.b
+        self._last_output_ref = weakref.ref(y)
         return y  # type: ignore[return-value]
 
     def __repr__(self) -> str:

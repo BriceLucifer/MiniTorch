@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 import numpy as np
 
 from MiniTorch.core.variable import Variable
@@ -37,12 +39,15 @@ class Adam:
         self.t: int = 0
         self._m: list[np.ndarray] = [np.zeros_like(p.data) for p in parameters]
         self._v: list[np.ndarray] = [np.zeros_like(p.data) for p in parameters]
+        self._scratch: list[np.ndarray] = [
+            np.empty_like(p.data) for p in parameters
+        ]
 
     def step(self) -> None:
         self.t += 1
         lr_t = (
             self.lr
-            * np.sqrt(1 - self.beta2 ** self.t)
+            * math.sqrt(1 - self.beta2 ** self.t)
             / (1 - self.beta1 ** self.t)
         )
         for i, p in enumerate(self.parameters):
@@ -51,9 +56,21 @@ class Adam:
             g: np.ndarray = p.grad.data  # type: ignore[assignment]
             if self.weight_decay != 0:
                 g = g + self.weight_decay * p.data  # type: ignore[operator]
-            self._m[i] = self.beta1 * self._m[i] + (1 - self.beta1) * g
-            self._v[i] = self.beta2 * self._v[i] + (1 - self.beta2) * g ** 2
-            p.data -= lr_t * self._m[i] / (np.sqrt(self._v[i]) + self.eps)  # type: ignore[operator]
+            first_moment = self._m[i]
+            second_moment = self._v[i]
+            scratch = self._scratch[i]
+
+            first_moment *= self.beta1
+            first_moment += (1 - self.beta1) * g
+            second_moment *= self.beta2
+            np.multiply(g, g, out=scratch)
+            second_moment += (1 - self.beta2) * scratch
+
+            np.sqrt(second_moment, out=scratch)
+            scratch += self.eps
+            np.divide(first_moment, scratch, out=scratch)
+            scratch *= lr_t
+            p.data -= scratch  # type: ignore[operator]
 
     def zero_grad(self) -> None:
         for p in self.parameters:

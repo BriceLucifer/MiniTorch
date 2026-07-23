@@ -1,12 +1,22 @@
 # Python-generated files
 __pycache__/
 *.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
+.coverage
+.mypy_cache/
+.pytest_cache/
+*.egg-info/
+/build/
+/dist/
+/site/
+/wheels/
 
 # Virtual environments
-.venv
-./tests/__pycache__
+.venv/
+
+# Generated examples and native build products
 *.html
+*.so
+MiniTorch/native/_native_trainer.c
+
+# JavaScript dependencies
+node_modules/

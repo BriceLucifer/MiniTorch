@@ -27,6 +27,10 @@ class Square(Function):
         gx = 2 * x * gy  # type: ignore[operator]
         return gx  # type: ignore[return-value]
 
+    def backward_array(self, gy: np.ndarray) -> np.ndarray:
+        x = self.input_data(0)
+        return 2 * x * gy
+
 
 # more easy to use
 def square(x: Variable) -> Variable:
