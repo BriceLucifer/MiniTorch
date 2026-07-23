@@ -1,6 +1,6 @@
 [project]
 name = "minitorchbr"
-version = "0.4.0"
+version = "0.4.1"
 description = "A fast NumPy autograd framework with neural-network layers, optimizers, and interactive model visualization"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -67,5 +67,5 @@ docs = [
 [tool.cibuildwheel]
 build = ["cp310-*", "cp311-*", "cp312-*", "cp313-*", "cp314-*"]
 skip = ["*-musllinux_*"]
-test-command = "pytest {project}/tests -q"
+test-command = "pytest {project}/tests -q --import-mode=importlib"
 test-requires = ["pytest>=7"]
